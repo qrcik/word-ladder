@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: k.K
- * Date: 08.05.2017
- * Time: 22:42
- */
 
 echo wordLadder("hit", "cog", ["hot", "dot", "dog", "lot", "log", "cog"]);
 echo wordLadder("a", "c", ["a", "b", "c"]);
@@ -28,11 +22,8 @@ function bfs($graph, $start, $end, $visited)
     array_push($queue, $start);
     $visited[$start] = 1;
     $paths[$start][] = $start;
-    $counter = 0;
     while (count($queue)) {
         $current = array_shift($queue);
-
-        $counter++;
         foreach ($graph[$current] as $key => $vertex) {
             if (!$visited[$key] && $vertex == 1 && $current != $key) {
                 $paths[$key] = $paths[$current];
@@ -42,7 +33,7 @@ function bfs($graph, $start, $end, $visited)
             }
         }
     }
-//    echo "\n" . implode(" -> ", $paths[$end]);
+//    echo "\n" . implode(" -> ", $paths[$end]) . "\t";
     return count($paths[$end]);
 }
 
@@ -55,26 +46,21 @@ function init(&$visited, $graph)
 
 function prepareGraph($root, $words, $last)
 {
-    $size = strlen($root);
     $words = array_merge([$root, $last], $words);
     array_unique($words);
     $graph = [];
     foreach ($words as $word) {
         foreach ($words as $v) {
-            $graph[$word][$v] = countChanges($word, $v, $size) === 1 ? 1 : 0;
+            $graph[$word][$v] = countChanges($word, $v) ? 1 : 0;
         }
     }
 
     return $graph;
 }
 
-function countChanges($current, $next, $size)
+function countChanges($current, $next)
 {
-    $fromStart = strspn($next ^ $current, "\0");
-    $fromEnd = strspn(strrev($next) ^ strrev($current), "\0");
-    $changes = ($size - $fromEnd) - $fromStart;
-
-    return $changes;
+    return count(array_diff_assoc(str_split($current), str_split($next))) === 1;
 }
 
 function checkIfEndWordExists($endWord, $list)
